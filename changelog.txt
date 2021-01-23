@@ -1,2 +1,5 @@
+version 1.0.1+20210123
+      Update dependencies
+
 version 1.0.0+20210118
       Release based on the recaptcha plugin

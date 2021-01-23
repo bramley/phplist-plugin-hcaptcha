@@ -27,4 +27,5 @@ For guidance on configuring and using the plugin see the documentation page http
 ## Version history ##
 
     version         Description
+    1.0.1+20210123  Update dependencies
     1.0.0+20210118  First release

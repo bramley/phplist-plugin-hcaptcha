@@ -30,9 +30,6 @@ class HCaptchaPlugin extends phplistPlugin
     /** @var bool whether the site and secret keys have been entered */
     private $keysEntered;
 
-    /** @var string warning to display when captcha not completed */
-    private $incompleteWarning;
-
     /*
      *  Inherited from phplistPlugin
      */
@@ -131,11 +128,11 @@ class HCaptchaPlugin extends phplistPlugin
                 && version_compare($plugins['CommonPlugin']->version, '3.7.17') >= 0
             ),
             'phpList version 3.3.0 or later' => version_compare(VERSION, '3.3') > 0,
+            'curl extension enabled' => extension_loaded('curl'),
         );
     }
 
     /**
-     * Add a configuration setting for the request method.
      * Cache the plugin's config settings.
      * hCaptcha will be used only when both the site key and secrety key have
      * been entered.
@@ -249,7 +246,7 @@ END;
             return $translator->s('Please complete the hCaptcha');
         }
         $data = [
-            'secret' => getConfig('hcaptcha_secretkey'),
+            'secret' => $this->secretKey,
             'response' => $_POST['h-captcha-response'],
         ];
         $verify = curl_init();
