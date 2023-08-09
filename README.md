@@ -8,9 +8,9 @@ This plugin provides an hCaptcha field on subscribe forms. See https://docs.hcap
 
 ### Dependencies ###
 
-The plugin requires phplist version 3.3.0 or later and php version 5.4 or later.
+The plugin requires phplist version 3.6.11 or later and php version 7 or later.
 
-The plugin also requires the php curl extension to be enabled and CommonPlugin to be enabled.
+The plugin also requires the CommonPlugin version 3.28.0 or later.
 That plugin is now included with phplist so you should only need to enable it.
 
 You must also create a site on hCaptcha.com, then enter the site key and the secret key into the plugin's settings.

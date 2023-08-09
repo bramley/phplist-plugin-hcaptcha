@@ -11,6 +11,8 @@
  * @see       https://docs.hcaptcha.com/
  */
 use phpList\plugin\Common\FrontendTranslator;
+use phpList\plugin\Common\Logger;
+use phpList\plugin\Common\StringStream;
 
 /**
  * This class registers the plugin with phplist and hooks into the display and validation
@@ -123,12 +125,11 @@ class HCaptchaPlugin extends phplistPlugin
         global $plugins;
 
         return array(
-            'Common Plugin v3.7.17 or later installed' => (
+            'Common Plugin v3.28.0 or later installed' => (
                 phpListPlugin::isEnabled('CommonPlugin')
-                && version_compare($plugins['CommonPlugin']->version, '3.7.17') >= 0
+                && version_compare($plugins['CommonPlugin']->version, '3.28.0') >= 0
             ),
-            'phpList version 3.3.0 or later' => version_compare(VERSION, '3.3') > 0,
-            'curl extension enabled' => extension_loaded('curl'),
+            'phpList version 3.6.11 or later' => version_compare(VERSION, '3.6.11') >= 0,
         );
     }
 
@@ -249,15 +250,21 @@ END;
             'secret' => $this->secretKey,
             'response' => $_POST['h-captcha-response'],
         ];
-        $verify = curl_init();
-        curl_setopt($verify, CURLOPT_URL, 'https://hcaptcha.com/siteverify');
-        curl_setopt($verify, CURLOPT_POST, true);
-        curl_setopt($verify, CURLOPT_POSTFIELDS, http_build_query($data));
-        curl_setopt($verify, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($verify);
-        $responseData = json_decode($response);
+        $request = new HTTP_Request2('https://hcaptcha.com/siteverify', HTTP_Request2::METHOD_POST);
+        $request->addPostParameter($data);
+        $logOutput = '';
+        $request->attach(new HTTP_Request2_Observer_Log(StringStream::fopen($logOutput, 'w')));
+        $response = $request->send();
+        Logger::instance()->debug("\n" . $logOutput);
+        $responseData = json_decode($response->getBody());
 
-        return $responseData->success ? '' : implode(', ', $responseData->{'error-codes'});
+        if ($responseData->success) {
+            return '';
+        }
+
+        return isset($responseData->{'error-codes'})
+            ? implode(', ', $responseData->{'error-codes'})
+            : 'unspecified error';
     }
 
     /**
